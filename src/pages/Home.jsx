@@ -10,12 +10,24 @@ export const Home = () => {
 
   const [isLoading, setIsLoading] = useState(true);
 
+  const [categoryId, setCategoryId] = useState(0);
+  const [sortType, setSortType] = useState({
+    name: 'популярности (DESC)',
+    sortProperty: 'rating',
+  });
+
   useEffect(() => {
     try {
       setIsLoading(true);
 
       const fetchData = async () => {
-        const pizzasItem = await axios.get('http://localhost:3004/pizzas');
+        const order = sortType.sortProperty.includes('-') ? 'asc' : 'desc';
+        const sortBy = sortType.sortProperty.replace('-', '');
+        const category = categoryId ? `category=${categoryId}` : '';
+
+        const pizzasItem = await axios.get(
+          `http://localhost:3004/pizzas?${category}&_sort=${sortBy}&_order=${order} `
+        );
 
         setPizzas(pizzasItem.data);
 
@@ -27,12 +39,16 @@ export const Home = () => {
       alert('Ошибка получения данных');
       console.log(error);
     }
-  }, []);
+  }, [categoryId, sortType]);
+
   return (
     <>
       <div className="content__top">
-        <Categories />
-        <Sort />
+        <Categories
+          value={categoryId}
+          onClickCategory={(id) => setCategoryId(id)}
+        />
+        <Sort value={sortType} onClickSort={(obj) => setSortType(obj)} />
       </div>
       <h2 className="content__title">Все пиццы</h2>
       <div className="content__items">
