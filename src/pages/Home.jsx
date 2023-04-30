@@ -6,19 +6,31 @@ import { PizzaBlock } from '../components/PizzaBlock';
 import axios from 'axios';
 import { AppContext } from '../App';
 import { Pagination } from '../components/Pagination';
+import { useDispatch, useSelector } from 'react-redux';
+import { setCategoryId } from '../redux/slices/filterSlice';
 
 export const Home = () => {
+  const dispatch = useDispatch();
+  // const categoryId = useSelector((state) => state.filterSlice.categoryId);
+  // const sortType = useSelector((state) => state.filterSlice.sort);
+  const { categoryId, sortType } = useSelector((state) => state.filterSlice);
+
   const [pizzas, setPizzas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [categoryId, setCategoryId] = useState(0);
-  const [sortType, setSortType] = useState({
-    name: 'популярности (DESC)',
-    sortProperty: 'rating',
-  });
+  // const [categoryId, setCategoryId] = useState(0);
+  // const setCategoryId = 0;
+  // const [sortType, setSortType] = useState({
+  //   name: 'популярности (DESC)',
+  //   sortProperty: 'rating',
+  // });
+
   const [currentPage, setCurrentPage] = useState(1);
 
   const { searchValue } = useContext(AppContext);
 
+  const onClickCategory = (id) => {
+    dispatch(setCategoryId(id));
+  };
 
   useEffect(() => {
     try {
@@ -68,17 +80,13 @@ export const Home = () => {
   return (
     <>
       <div className="content__top">
-        <Categories
-          value={categoryId}
-          onClickCategory={(id) => setCategoryId(id)}
-        />
-        <Sort value={sortType} onClickSort={(obj) => setSortType(obj)} />
+        <Categories value={categoryId} onClickCategory={onClickCategory} />
+        {/* <Sort value={sortType} onClickSort={(obj) => setSortType(obj)} /> */}
+        <Sort />
       </div>
       <h2 className="content__title">Все пиццы</h2>
       <div className="content__items">{isLoading ? skeleton : pizzasAll}</div>
-      <Pagination
-        setCurrentPage={setCurrentPage}
-      />
+      <Pagination setCurrentPage={setCurrentPage} />
     </>
   );
 };
